@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Session Beans</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+    </head>
+    <body style="font-family: 'Indie Flower', cursive;">
+        <div style="background-image: url('tafel.jpg'); background-repeat:no-repeat; background-position: center top; background-size: 100% auto; position:relative; width:600px;height:500px; margin-left:auto; margin-right:auto;">
+
+            <h1 id="header" style="position:relative; text-align:center; margin-top:3px; color:white; top:3%;">Tax Calculator</h1>
+
+            <form style="position:relative; left:30%; width:40%; top:3%;">
+                <label style="position:relative; float:left; color:white;">Amount:</label>
+                <input id="amount" type="text" name="amount" style="position:relative; float:right; margin: 0px 0px 5px 0px">
+                <label style="position:relative; float:left; clear:both; color:white;">+ Tax (%):</label>
+                <input id="tax" type="text" name="tax" style="position:relative; float:right; margin: 0px 0px 5px 0px">
+
+                <div style="clear:both; position:relative; left:40%;">
+                    <select id="currency">
+                        <option value="Dollar">Dollar</option>
+                        <option value="Euro">Euro</option>
+                        <option value="Pound">Pound</option>
+                    </select> <br>
+                </div>
+                <button type="button" style="position:relative; margin:5px 0px 0px 0px;" onclick="calculateLocal()">Calculate Local</button>
+                <button type="button" style="position:relative;  margin:5px 0px 0px 0px;" onclick="calculateRemote()">Calculate Remote</button>
+                <button type="button" style="position:relative;  margin:5px 0px 0px 0px;" onclick="calculateDepInj()">Calculate Dep. Inj.</button>
+                <button type="reset" style="position:relative;  margin:5px 0px 0px 0px;">Reset</button>                
+            </form>
+
+            <h2 id="result" style="position:relative; clear:both; color:white; top:3%; text-align: center;"></h2>
+            
+            <p id="counter" style="position: relative; clear:both; color:white; text-align: center; font-size: 10pt;"></p>
+
+            <p style="position: absolute; bottom:0; text-align: center; left:25%; font-size: 10pt;">&copy HS Fulda, Middleware Lecture, For Demonstration Purpose Only</p>
+
+        </div>
+        <script>
+            /**
+             * 5.1 a) Function to calculate the total amount with a Local Interface Bean.
+             * @returns void
+             */
+            function calculateLocal() {
+                var amount = $("#amount").val();
+                var tax = $("#tax").val();
+                var currency = $("#currency option:selected").text();
+                var result;
+
+                //just a simple test to check whether all needed values are filled in or not
+                if (amount.length === 0 || tax.length === 0) {
+                    result = "Please fill in the form";
+                    $("#result").text(result);
+
+                } else {
+                    amount = amount.replace(",", ".");
+                    tax = tax.replace(",", ".");
+
+                    //send values via post request to the backend
+                    $.post("http://localhost:8081/Exercise5/TaxCalcLocal", {amount: amount, tax: tax, currency: currency})
+                            .done(function (data) {
+                                $("#result").text(data);
+                            });
+                            
+                    getCounter();
+                }
+
+            }
+
+            /**
+             * 5.1 b) Function to calculate the total amount with a Remote Interface Bean.
+             * @returns void
+             */
+            function calculateRemote() {
+                var amount = $("#amount").val();
+                var tax = $("#tax").val();
+                var currency = $("#currency option:selected").text();
+                var result;
+
+                //just a simple test to check whether all needed values are filled in or not
+                if (amount.length === 0 || tax.length === 0) {
+                    result = "Please fill in the form";
+                    $("#result").text(result);
+
+                } else {
+                    amount = amount.replace(",", ".");
+                    tax = tax.replace(",", ".");
+
+                    //send values via post request to the backend
+                    $.post("http://localhost:8081/Exercise5/TaxCalcRemote", {amount: amount, tax: tax, currency: currency})
+                            .done(function (data) {
+                                $("#result").text(data);
+                            });
+                    
+                    getCounter();
+                }
+
+            }
+
+            /**
+             * 5.1 c) Function to calculate the total amount via Dependency Injection of a Bean.
+             * @returns void
+             */
+            function calculateDepInj() {
+                var amount = $("#amount").val();
+                var tax = $("#tax").val();
+                var currency = $("#currency option:selected").text();
+                var result;
+
+                //just a simple test to check whether all needed values are filled in or not
+                if (amount.length === 0 || tax.length === 0) {
+                    result = "Please fill in the form";
+                    $("#result").text(result);
+
+                } else {
+                    amount = amount.replace(",", ".");
+                    tax = tax.replace(",", ".");
+
+                    //send values via post request to the backend
+                    $.post("http://localhost:8081/Exercise5/TaxCalcDepInj", {amount: amount, tax: tax, currency: currency})
+                            .done(function (data) {
+                                $("#result").text(data);
+                            });
+                            
+                     getCounter();
+                }
+
+            }
+            
+            /**
+             * 5.3 Gets a calculation counter
+             * @returns void
+             */
+            function getCounter(){
+                $.post("http://localhost:8081/Exercise5/TaxCounter")
+                            .done(function (data) {
+                                $("#counter").text("Number of calculations: "+data);
+                            });
+            }
+
+        </script>
+    </body>
+</html>
